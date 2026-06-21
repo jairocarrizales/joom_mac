@@ -1,0 +1,21 @@
+# Dependencias
+node_modules/
+
+# Salidas / temporales
+dist/
+out/
+*.mp4
+*.webm
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Logs y editores
+*.log
+.vscode/
+.idea/
+npm-debug.log*

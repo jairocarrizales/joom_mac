@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: mediastream: http://127.0.0.1:*; script-src 'self' blob:; worker-src 'self' blob:; connect-src 'self' http://127.0.0.1:* blob: data:;" />
+  <title>Vista previa</title>
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; cursor: grab; }
+    #canvas { width: 100vw; height: 100vh; object-fit: contain; display: block; pointer-events: none; }
+    video { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Vídeos de trabajo ocultos; el canvas se muestra como vista previa -->
+  <video id="screen" autoplay muted playsinline></video>
+  <video id="webcam" autoplay muted playsinline></video>
+  <video id="ytvideo" crossorigin="anonymous" playsinline></video>
+  <canvas id="canvas"></canvas>
+  <!-- pdf.js (UMD) para renderizar presentaciones. Script clásico: SÍ carga desde file://
+       (los módulos ES no cargan por file://). Expone window.pdfjsLib. -->
+  <script src="vendor/pdf.js"></script>
+  <script src="recorder.js"></script>
+</body>
+</html>

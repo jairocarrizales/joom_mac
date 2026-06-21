@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob: mediastream:;" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Joom</title>
+</head>
+<body>
+  <div class="control">
+    <!-- Sidebar con iconos de navegación. El de "reel" se muestra solo en modo Reel. -->
+    <aside class="sidebar">
+      <button class="side-btn active" data-tab="capture" title="Capturar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+      </button>
+      <button class="side-btn" data-tab="imageaudio" title="Imagen y audio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+      </button>
+      <button class="side-btn hidden" id="reelTabBtn" data-tab="reel" title="Reel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+      </button>
+      <button class="side-btn" data-tab="subs" title="Subtítulos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
+      </button>
+    </aside>
+
+    <div class="main">
+      <h1><span class="dot"></span> Joom</h1>
+
+      <!-- Acciones siempre visibles (no dependen de la pestaña activa) -->
+      <div id="topActions" style="display:flex; gap:8px; align-items:stretch; margin-bottom:10px;">
+        <button id="startBtn" class="btn btn-rec" title="Grabar (Ctrl+Shift+R)" style="flex:0 0 46px; width:46px; height:46px; margin:0; padding:0; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#fff" stroke="none"><circle cx="12" cy="12" r="7"/></svg>
+        </button>
+        <button id="tpBtn" class="btn btn-ghost icon-btn" title="Teleprompter" style="flex:0 0 46px; width:46px; height:46px; margin:0; padding:0; display:flex; align-items:center; justify-content:center;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></svg>
+        </button>
+      </div>
+
+      <!-- Configuración (visible antes de grabar) -->
+      <div id="setup">
+
+        <!-- TAB Capturar -->
+        <div class="tab-panel active" data-panel="capture">
+          <div class="field">
+            <label>Modo</label>
+            <select id="modeSel">
+              <option value="normal">Pantalla completa (horizontal)</option>
+              <option value="reel">Reel vertical (9:16)</option>
+              <option value="podcast">Pantalla + cámara vertical (podcast)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Pantalla</label>
+            <select id="sourceSel"></select>
+          </div>
+
+          <div class="field">
+            <label>Calidad</label>
+            <select id="qualitySel">
+              <option value="720">Ligera — 720p · 30fps</option>
+              <option value="1080" selected>Alta — 1080p · 30fps (por defecto)</option>
+              <option value="1080-60">Fluida — 1080p · 60fps</option>
+              <option value="1440">Máxima — 1440p · 30fps</option>
+            </select>
+          </div>
+
+          <p class="hint">Al grabar (botón ● Grabar de arriba) aparece una barra flotante con los controles (pausar, detener y anotaciones). El panel se oculta mientras grabas. El 📜 Teleprompter es un guion flotante que NO sale en el video y funciona en cualquier modo.</p>
+          <p class="hint">Atajos: Ctrl+Shift+R grabar/detener · Ctrl+Shift+P pausar · Ctrl+Shift+A anotaciones · Ctrl+Shift+L láser · Ctrl+Shift+C confeti</p>
+        </div>
+
+        <!-- TAB Imagen y audio -->
+        <div class="tab-panel" data-panel="imageaudio">
+          <div class="field">
+            <label>Cámara</label>
+            <select id="cameraSel"></select>
+          </div>
+
+          <div id="normalOpts" class="field">
+            <label>Forma de cámara</label>
+            <select id="shapeSel">
+              <option value="circle">● Círculo</option>
+              <option value="vertical">▮ Vertical (móvil)</option>
+              <option value="wide">▭ Horizontal 16:9 (sin recorte)</option>
+              <option value="none">✕ Sin cámara (solo pantalla)</option>
+            </select>
+            <label class="check"><input type="checkbox" id="borderChk" checked /> Borde blanco</label>
+          </div>
+
+          <div class="field">
+            <label>Zoom de cámara: <span id="zoomLbl">100%</span></label>
+            <input type="range" id="zoomRange" min="50" max="220" value="100" />
+            <p class="sublabel">Menos de 100% = alejar (útil en podcast para verte más completo).</p>
+          </div>
+
+          <div class="field">
+            <label>Micrófono</label>
+            <select id="micSel"></select>
+            <label class="check"><input type="checkbox" id="sysAudioChk" /> Audio del sistema</label>
+          </div>
+        </div>
+
+        <!-- TAB Reel -->
+        <div class="tab-panel" data-panel="reel">
+          <div id="reelOpts">
+            <div class="field">
+              <label>Diseño del reel</label>
+              <select id="bandPosSel">
+                <option value="full">Solo cámara (100%)</option>
+                <option value="youtube-top">Video arriba + cámara abajo</option>
+                <option value="youtube-pie">Cámara arriba + Video abajo</option>
+                <option value="screen-top">Pantalla arriba + cámara abajo</option>
+                <option value="screen-pie">Cámara arriba + Pantalla abajo</option>
+              </select>
+            </div>
+
+            <div class="field" id="ytField" style="display:none">
+              <label>Contenido (video o presentación)</label>
+              <input type="text" id="ytUrl" placeholder="URL de YouTube…" />
+              <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+                <button id="ytDownloadBtn" class="btn btn-ghost" style="flex:1; min-width:96px; margin:0;">⬇ YouTube</button>
+                <button id="ytUploadBtn" class="btn btn-ghost" style="flex:1; min-width:96px; margin:0;">📁 Video PC</button>
+                <button id="ytPresBtn" class="btn btn-ghost" style="flex:1; min-width:96px; margin:0;">📑 PDF / PowerPoint</button>
+              </div>
+              <input type="text" id="slidesUrl" placeholder="URL de Google Slides (compartida públicamente)…" style="margin-top:6px" />
+              <button id="slidesBtn" class="btn btn-ghost" style="margin-top:6px">🖼 Cargar Google Slides</button>
+              <p id="ytStatus" class="hint"></p>
+              <p class="sublabel">El contenido ocupa el 100% del ancho y la cámara llena el resto. Durante la grabación: <b>video</b> → pausar/regresar; <b>presentación</b> → anterior/siguiente (una diapositiva a la vez). El PowerPoint se convierte con tu PowerPoint instalado.</p>
+            </div>
+
+            <p class="hint">Reel vertical 1080×1920.</p>
+          </div>
+        </div>
+
+        <!-- TAB Subtítulos (Groq) -->
+        <div class="tab-panel" data-panel="subs">
+          <div class="field">
+            <label>API key de Groq</label>
+            <div style="position:relative">
+              <input type="password" id="groqKey" placeholder="gsk_..." style="padding-right:34px" />
+              <button id="groqKeyToggle" type="button" title="Mostrar/ocultar" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;color:var(--muted);padding:4px 6px;display:flex;align-items:center"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+            <p class="sublabel">Se guarda en este equipo al escribirla. Consíguela gratis en console.groq.com (whisper-large-v3).</p>
+          </div>
+          <div class="field">
+            <label>Idioma del audio</label>
+            <select id="subLang">
+              <option value="">Auto</option>
+              <option value="es">Español</option>
+              <option value="en">Inglés</option>
+            </select>
+            <label class="check" style="margin-top:6px"><input type="checkbox" id="subPolishChk" /> Corregir palabras con IA (Groq)</label>
+          </div>
+          <input type="hidden" id="subStyle" value="pop" />
+          <div class="sublabel" style="margin-top:4px">Estilo de subtítulos</div>
+          <div id="subStyleCats" class="style-cats"></div>
+          <div id="subStyleGrid" class="style-grid"></div>
+          <button id="subBtn" class="btn btn-rec" style="margin-top:10px">Generar subtítulos…</button>
+          <p id="subStatus" class="hint"></p>
+          <p class="hint">Elige un video; se crea una copia <code>…-subs.mp4</code> con los subtítulos quemados. Mejor con clips/reels (hasta ~24 min por el límite de Groq).</p>
+        </div>
+      </div>
+
+      <!-- Exportación -->
+      <div id="exporting" class="hidden">
+        <div class="timer">Exportando…</div>
+        <p id="exportStatus" class="hint">Convirtiendo a MP4 con ffmpeg…</p>
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <div id="countdown" class="countdown hidden"></div>
+
+  <script src="control.js"></script>
+  <script src="subs.js"></script>
+</body>
+</html>

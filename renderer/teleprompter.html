@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Teleprompter</title>
+</head>
+<body class="tp">
+  <div class="tp-bar">
+    <button id="play" class="tpbtn" title="Reproducir/Pausar">▶</button>
+    <span class="tp-sep"></span>
+    <button id="slower" class="tpbtn" title="Más lento">−</button>
+    <span id="spd" class="tp-val">vel 40</span>
+    <button id="faster" class="tpbtn" title="Más rápido">+</button>
+    <span class="tp-sep"></span>
+    <button id="smaller" class="tpbtn" title="Texto más pequeño">A−</button>
+    <button id="bigger" class="tpbtn" title="Texto más grande">A+</button>
+    <span class="tp-sep"></span>
+    <button id="reset" class="tpbtn" title="Volver al inicio">⟲</button>
+    <button id="tpclose" class="tpbtn close" title="Cerrar">✕</button>
+  </div>
+  <div id="text" class="tp-text" contenteditable="true" spellcheck="false">Escribe o pega aquí tu guion. Pulsa ▶ para que empiece a desplazarse mientras miras a la cámara.</div>
+  <script src="teleprompter.js"></script>
+</body>
+</html>

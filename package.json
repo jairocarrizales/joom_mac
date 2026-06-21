@@ -1,0 +1,63 @@
+{
+  "name": "joom",
+  "version": "0.1.0",
+  "description": "Grabador de pantalla + webcam para macOS (pantalla completa, reel vertical, podcast) con barra de anotaciones para presentar",
+  "main": "main.js",
+  "author": "Jairo Carrizales <carribros@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "ELECTRON_RUN_AS_NODE= electron .",
+    "dist": "electron-builder --mac",
+    "dist:mac": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.jairocarrizales.joom",
+    "productName": "Joom",
+    "directories": {
+      "output": "dist"
+    },
+    "asarUnpack": [
+      "**/node_modules/ffmpeg-static/**"
+    ],
+    "mac": {
+      "icon": "build/icon_master.png",
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "extendInfo": {
+        "NSCameraUsageDescription": "Joom necesita la cámara para componer tu webcam en la grabación.",
+        "NSMicrophoneUsageDescription": "Joom necesita el micrófono para grabar tu voz.",
+        "NSScreenCaptureUsageDescription": "Joom necesita grabar la pantalla."
+      },
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "dmg": {
+      "title": "Joom"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0",
+    "pdfjs-dist": "^3.11.174"
+  }
+}

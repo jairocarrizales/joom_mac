@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline';" />
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; cursor: crosshair; }
+    canvas { display: block; }
+    .tag {
+      position: fixed; left: 50%; top: 18px; transform: translateX(-50%);
+      background: rgba(28,31,39,0.95); color: #e8eaf0;
+      font: 13px -apple-system, sans-serif; padding: 8px 14px; border-radius: 10px;
+      border: 1px solid #2c2f3a; pointer-events: none;
+    }
+  </style>
+  <title>Zona</title>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <div class="tag">Arrastra para elegir la <b>zona</b> de la pantalla que verás en el reel · esquinas para redimensionar</div>
+  <script src="region.js"></script>
+</body>
+</html>
