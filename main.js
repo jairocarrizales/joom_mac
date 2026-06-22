@@ -346,10 +346,12 @@ function showReelPreview() {
     width: w, height: h,
   });
   recorderWindow.setAlwaysOnTop(true, 'floating');
+  recorderWindow.setIgnoreMouseEvents(false); // la previa sí es interactiva
+  recorderWindow.setOpacity(1);               // (pudo quedar en 0 de una grabación normal)
   recorderWindow.showInactive();
-  // Reafirmar AL MOSTRAR: la ventana se crea oculta y en Windows la protección
-  // de captura solo "agarra" cuando la ventana es visible. Sin esto, la previa
-  // se colaba dentro del video grabado (efecto "doble").
+  // Reafirmar AL MOSTRAR: la ventana se crea oculta y la protección de captura
+  // solo "agarra" cuando la ventana es visible. Sin esto, la previa se colaba
+  // dentro del video grabado (efecto "doble").
   recorderWindow.setContentProtection(true);
   const send = () => recorderWindow.webContents.send('start-preview', reelPreviewSettings());
   if (recorderWindow.webContents.isLoading()) recorderWindow.webContents.once('did-finish-load', send);
@@ -361,6 +363,25 @@ function hideReelPreview() {
     recorderWindow.webContents.send('stop-preview');
     recorderWindow.hide();
   }
+}
+
+// El compositor (canvas + MediaRecorder) vive en su propia ventana. En macOS una
+// ventana que nunca se muestra (show:false) NO ejecuta el compositor de la GPU, así
+// que `canvas.captureStream` se queda sin frames y el video se congela / va lento
+// pasados los primeros segundos. En Windows una ventana oculta sí compone, por eso
+// allí no ocurría. Solución: durante la grabación NORMAL mantenemos la ventana
+// renderizando pero INVISIBLE (opacidad 0, click-through y en pantalla para que el
+// servidor de ventanas la componga). La protección de contenido la excluye de la
+// captura, así que no aparece en el video.
+function showRecorderHidden() {
+  if (!recorderWindow) return;
+  const d = screen.getPrimaryDisplay();
+  recorderWindow.setBounds({ x: d.workArea.x, y: d.workArea.y, width: 300, height: 534 });
+  recorderWindow.setOpacity(0);
+  recorderWindow.setIgnoreMouseEvents(true, { forward: true });
+  recorderWindow.setAlwaysOnTop(true, 'screen-saver');
+  recorderWindow.showInactive();
+  recorderWindow.setContentProtection(true);
 }
 
 // Vista previa del modo podcast (lienzo 16:9 con pantalla + cámara vertical),
@@ -382,6 +403,8 @@ function showPodcastPreview() {
     width: w, height: h,
   });
   recorderWindow.setAlwaysOnTop(true, 'floating');
+  recorderWindow.setIgnoreMouseEvents(false);
+  recorderWindow.setOpacity(1);
   recorderWindow.showInactive();
   // Reafirmar la protección de captura al mostrar (ver nota en showReelPreview).
   recorderWindow.setContentProtection(true);
@@ -706,6 +729,10 @@ ipcMain.handle('start-recording', async (_e, settings) => {
     }
   }
   if (!recorderWindow) createRecorderWindow();
+  // En modo normal no hay previa visible, pero el compositor debe seguir
+  // pintando para alimentar canvas.captureStream (si no, en macOS el video se
+  // congela tras unos segundos). Lo mostramos invisible.
+  if (recMode === 'normal') showRecorderHidden();
 
   // Ocultar el panel y mostrar la barra unificada de grabación.
   isRecording = true;
