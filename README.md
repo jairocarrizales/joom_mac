@@ -29,10 +29,32 @@ un `<canvas>` y se graban con `MediaRecorder`; al detener, `ffmpeg` convierte a 
 - macOS 12+ (Apple Silicon o Intel)
 - Node.js 18+
 - `ffmpeg` se incluye vía `ffmpeg-static` (con respaldo al `ffmpeg` del PATH)
-- **Opcional** — `yt-dlp` para el reel con vídeos de YouTube:
-  `brew install yt-dlp`
-- **Opcional** — para convertir PowerPoint (`.pptx`/`.ppt`) a PDF:
-  `brew install --cask libreoffice` (o ten **Keynote** instalado; se usa como respaldo)
+
+### Dependencias opcionales (por función)
+
+| Función | Necesitas | Instalar |
+|---|---|---|
+| Reel con vídeo de **YouTube** | `yt-dlp` | `brew install yt-dlp` |
+| Reel con **PowerPoint** (`.pptx`/`.ppt`) | **LibreOffice** o **Keynote** | `brew install --cask libreoffice` |
+
+> La grabación, la cámara, el reel con vídeo/PDF local y Google Slides funcionan
+> sin instalar nada extra. `yt-dlp` solo hace falta si pegas una URL de YouTube;
+> la app detecta el binario al vuelo (no requiere reiniciar) y avisa si falta.
+
+### Configuración recomendada (la que se usó para validar)
+
+```bash
+brew install yt-dlp                 # vídeos de YouTube en el reel
+brew install --cask libreoffice    # PowerPoint -> PDF (opcional)
+npm install                        # baja Electron + ffmpeg (binario nativo de tu Mac)
+```
+
+## Grabación
+
+La pantalla + webcam se componen en un `<canvas>` y se graban con `MediaRecorder`
+en **MP4 / H.264 usando el codificador por hardware de macOS (VideoToolbox)**, así
+la grabación va siempre en tiempo real (sin cámara lenta). Al detener, `ffmpeg`
+solo reempaqueta a MP4 listo para web (`+faststart`), sin recodificar.
 
 ## Permisos de macOS
 
