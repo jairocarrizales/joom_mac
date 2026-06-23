@@ -383,6 +383,8 @@ html.overlay, body.overlay { background: transparent !important; overflow: hidde
 /* Escudo: máscara via clipPath SVG en overlay.html */
 .bubble.shield { border-radius: 0; border: none; clip-path: url(#shield); }
 .bubble.shield video { border-radius: 0; }
+.bubble.shield2 { border-radius: 0; border: none; clip-path: url(#shield2); }
+.bubble.shield2 video { border-radius: 0; }
 .bubble.noborder { border: none; box-shadow: none; }  /* sin marco blanco */
 .bubble:active { cursor: grabbing; }
 .bubble video {

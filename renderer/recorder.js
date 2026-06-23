@@ -212,6 +212,18 @@ function tracePath(x, y, w, h) {
     ctx.bezierCurveTo(X(0.95), Y(0.42), X(0.82), Y(0.80), X(0.50), Y(0.96));
     ctx.bezierCurveTo(X(0.18), Y(0.80), X(0.05), Y(0.42), X(0.10), Y(0.12));
     ctx.closePath();
+  } else if (shape === 'shield2') {
+    // Escudo 2: top plano con esquinas redondeadas, lados rectos y base curva.
+    const X = (u) => x + u * w, Y = (v) => y + v * h;
+    ctx.beginPath();
+    ctx.moveTo(X(0.06), Y(0.16));
+    ctx.bezierCurveTo(X(0.06), Y(0.07), X(0.11), Y(0.03), X(0.20), Y(0.03));
+    ctx.lineTo(X(0.80), Y(0.03));
+    ctx.bezierCurveTo(X(0.89), Y(0.03), X(0.94), Y(0.07), X(0.94), Y(0.16));
+    ctx.lineTo(X(0.94), Y(0.46));
+    ctx.bezierCurveTo(X(0.94), Y(0.74), X(0.76), Y(0.93), X(0.50), Y(0.985));
+    ctx.bezierCurveTo(X(0.24), Y(0.93), X(0.06), Y(0.74), X(0.06), Y(0.46));
+    ctx.closePath();
   } else {
     const r = Math.min(w, h) / 2;
     ctx.beginPath();
@@ -251,7 +263,7 @@ function drawWebcam() {
   if (mode === 'reel' && bandPos === 'bubble' && bubbleSizeFrac > 0) {
     const cx = x + w / 2, cy = y + h / 2;
     const newW = Math.round(cw * bubbleSizeFrac);
-    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : (shape === 'shield' ? 1.12 : 1));
+    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : (shape === 'shield' ? 1.12 : (shape === 'shield2' ? 1.35 : 1)));
     const newH = Math.round(newW * aspectH);
     x = cx - newW / 2;
     y = cy - newH / 2;

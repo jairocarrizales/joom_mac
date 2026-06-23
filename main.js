@@ -145,6 +145,7 @@ function aspectFor(shape) {
   if (shape === 'pebble') return 1; // canto rodado (orgánica)
   if (shape === 'feather') return 1; // círculo difuminado (niebla)
   if (shape === 'shield') return 1.12; // escudo (algo más alto que ancho)
+  if (shape === 'shield2') return 1.35; // escudo 2 (top plano, base curva; más alto)
   return 1;
 }
 
@@ -155,6 +156,7 @@ function defaultWidthFor(shape) {
   if (shape === 'pebble') return 270;
   if (shape === 'feather') return 240;
   if (shape === 'shield') return 230;
+  if (shape === 'shield2') return 215;
   return 220;
 }
 
