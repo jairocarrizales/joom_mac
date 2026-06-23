@@ -385,6 +385,12 @@ html.overlay, body.overlay { background: transparent !important; overflow: hidde
 .bubble.shield video { border-radius: 0; }
 .bubble.shield2 { border-radius: 0; border: none; clip-path: url(#shield2); }
 .bubble.shield2 video { border-radius: 0; }
+/* Esquina (cuarto de elipse): la vista previa se dibuja en un CANVAS con el MISMO
+   código que la grabación, para que coincidan exactamente (no CSS). */
+.bubble #cc { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+.bubble.cornermode { border: none; box-shadow: none; background: transparent; border-radius: 0; }
+.bubble.cornermode #cc { display: block; }
+.bubble.cornermode video { opacity: 0; }  /* sigue decodificando frames para el canvas */
 .bubble.noborder { border: none; box-shadow: none; }  /* sin marco blanco */
 .bubble:active { cursor: grabbing; }
 .bubble video {

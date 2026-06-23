@@ -146,6 +146,7 @@ function aspectFor(shape) {
   if (shape === 'feather') return 1; // círculo difuminado (niebla)
   if (shape === 'shield') return 1.12; // escudo (algo más alto que ancho)
   if (shape === 'shield2') return 1.35; // escudo 2 (top plano, base curva; más alto)
+  // 'corner-*' (esquinas): cuarto de círculo, cuadrado.
   return 1;
 }
 
@@ -157,6 +158,7 @@ function defaultWidthFor(shape) {
   if (shape === 'feather') return 240;
   if (shape === 'shield') return 230;
   if (shape === 'shield2') return 215;
+  if (shape && shape.indexOf('corner-') === 0) return 320;
   return 220;
 }
 
@@ -768,6 +770,7 @@ ipcMain.on('overlay-resize', (_e, width) => {
   const w = Math.max(80, Math.min(600, Math.round(width)));
   const h = Math.round(w * aspectFor(cameraShape));
   overlayWindow.setBounds({ x: b.x, y: b.y, width: w, height: h });
+  snapOverlayToCorner();
 });
 
 // --- Anotaciones (IPC) --- solo la capa de dibujo; la barra es la recbar.
@@ -794,6 +797,24 @@ ipcMain.on('annot-cmd', (_e, cmd) => {
   applyAnnotMouse();
   annotateWindow.webContents.send('annot-config', annotConfig());
 });
+
+// Para las formas "esquina" (cuarto de elipse), pega la burbuja al borde REAL de
+// la pantalla (no al área de trabajo) para que sus lados rectos coincidan con los
+// bordes y no se vea una línea recta flotando.
+function snapOverlayToCorner() {
+  if (!overlayWindow || cameraShape.indexOf('corner-') !== 0) return;
+  const b = overlayWindow.getBounds();
+  const s = screen.getDisplayNearestPoint({ x: b.x, y: b.y }).bounds;
+  const isLeft = cameraShape === 'corner-bl' || cameraShape === 'corner-tl';
+  const isTop = cameraShape === 'corner-tl' || cameraShape === 'corner-tr';
+  // Sobrepasar un poco el borde (overhang) para que los lados RECTOS queden fuera
+  // de la pantalla y solo se vea la curva (sin la línea recta flotando).
+  const ohx = Math.round(b.width * 0.05);
+  const ohy = Math.round(b.height * 0.05);
+  const x = isLeft ? s.x - ohx : s.x + s.width - b.width + ohx;
+  const y = isTop ? s.y - ohy : s.y + s.height - b.height + ohy;
+  overlayWindow.setBounds({ x, y, width: b.width, height: b.height });
+}
 
 // El panel cambia cámara/forma/borde (incluido el modo "sin cámara").
 ipcMain.handle('update-camera', (_e, opts) => {
@@ -822,6 +843,7 @@ ipcMain.handle('update-camera', (_e, opts) => {
     overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, zoom: webcamZoom });
     overlayWindow.show();
   }
+  snapOverlayToCorner();
   sendReelParams();
   return true;
 });

@@ -224,6 +224,22 @@ function tracePath(x, y, w, h) {
     ctx.bezierCurveTo(X(0.94), Y(0.74), X(0.76), Y(0.93), X(0.50), Y(0.985));
     ctx.bezierCurveTo(X(0.24), Y(0.93), X(0.06), Y(0.74), X(0.06), Y(0.46));
     ctx.closePath();
+  } else if (shape && shape.indexOf('corner-') === 0) {
+    // Cuarto de ELIPSE anclado a una esquina (radios = ancho y alto): llena toda
+    // la caja, así la curva cubre todo el borde sin quedar recta en ninguna parte.
+    const isLeft = shape === 'corner-bl' || shape === 'corner-tl';
+    const isTop = shape === 'corner-tl' || shape === 'corner-tr';
+    const ccx = isLeft ? x : x + w;
+    const ccy = isTop ? y : y + h;
+    let a0, a1;
+    if (isLeft && !isTop) { a0 = -Math.PI / 2; a1 = 0; }            // abajo-izquierda
+    else if (!isLeft && !isTop) { a0 = Math.PI; a1 = 1.5 * Math.PI; } // abajo-derecha
+    else if (isLeft && isTop) { a0 = 0; a1 = Math.PI / 2; }          // arriba-izquierda
+    else { a0 = Math.PI / 2; a1 = Math.PI; }                          // arriba-derecha
+    ctx.beginPath();
+    ctx.moveTo(ccx, ccy);
+    ctx.ellipse(ccx, ccy, w, h, 0, a0, a1, false);
+    ctx.closePath();
   } else {
     const r = Math.min(w, h) / 2;
     ctx.beginPath();
@@ -278,6 +294,32 @@ function drawWebcam() {
   const dh = vh * scale;
   const cx = x + w / 2;
   const cy = y + h / 2;
+
+  // Esquina (cuarto de círculo): recorta a la esquina y centra el rostro en el
+  // centroide del cuarto para que el sujeto quede dentro de la zona visible.
+  if (shape.indexOf('corner-') === 0) {
+    const isLeft = shape === 'corner-bl' || shape === 'corner-tl';
+    const isTop = shape === 'corner-tl' || shape === 'corner-tr';
+    // CLAVE: anclar al borde del LIENZO (no a la posición flotante). Así los
+    // lados rectos coinciden con los bordes y nunca se ve una línea recta.
+    x = isLeft ? 0 : cw - w;
+    y = isTop ? 0 : ch - h;
+    ctx.save();
+    tracePath(x, y, w, h);
+    ctx.clip();
+    const k = 0.42; // centroide del cuarto respecto a la esquina (centra el rostro)
+    const ox = isLeft ? x + k * w : x + (1 - k) * w;
+    const oy = isTop ? y + k * h : y + (1 - k) * h;
+    // Factor de relleno: al desplazar hacia la esquina, ampliamos el "cover" para
+    // que el cuarto quede 100% cubierto (sin hueco) y pegado al borde.
+    const cs = Math.max(w / vw, h / vh) * webcamZoom * 1.3;
+    const cdw = vw * cs, cdh = vh * cs;
+    ctx.translate(ox, oy);
+    ctx.scale(-1, 1);
+    ctx.drawImage(webcamVideo, -cdw / 2, -cdh / 2, cdw, cdh);
+    ctx.restore();
+    return;
+  }
 
   // Círculo difuminado (niebla): el borde se desvanece con una máscara alfa
   // radial, así la cámara se funde con el fondo en vez de verse "pegada".
