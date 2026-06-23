@@ -86,7 +86,8 @@ let mediaRecorder = null;
 let drawInt = null;
 let webcamRect = null; // { fx, fy, fw, fh } en fracciones del display
 let shape = 'circle';  // 'circle' | 'vertical' | 'none'
-let border = true;     // ¿dibujar borde blanco alrededor de la cámara?
+let border = true;     // ¿dibujar borde alrededor de la cámara?
+let borderColor = '#ffffff'; // color del borde de la cámara
 
 let mode = 'normal';   // 'normal' | 'reel'
 let bandPos = 'bottom';
@@ -370,7 +371,7 @@ function drawWebcam() {
     ctx.save();
     tracePath(x + 1.5, y + 1.5, w - 3, h - 3);
     ctx.lineWidth = Math.max(2, Math.min(w, h) * 0.02);
-    ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+    ctx.strokeStyle = borderColor;
     ctx.stroke();
     ctx.restore();
   }
@@ -447,7 +448,7 @@ function drawWebcamTransition(t) {
     ctx.globalAlpha = 1 - t;
     roundRectPath(ctx, x + 1.5, y + 1.5, w - 3, h - 3, Math.max(0, bubbleR * (1 - t) - 1.5));
     ctx.lineWidth = Math.max(2, Math.min(w, h) * 0.02);
-    ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+    ctx.strokeStyle = borderColor;
     ctx.stroke();
     ctx.restore();
   }
@@ -915,6 +916,7 @@ let previewing = false;
 function applyReelSettings(settings) {
   shape = settings.shape || 'circle';
   border = settings.border !== false;
+  if (typeof settings.borderColor === 'string') borderColor = settings.borderColor;
   mode = (settings.mode === 'reel' || settings.mode === 'area' || settings.mode === 'podcast') ? settings.mode : 'normal';
   if (settings.bandPos) bandPos = settings.bandPos;
   if (typeof settings.bandHeightFrac === 'number') bandHeightFrac = settings.bandHeightFrac;
@@ -1117,6 +1119,7 @@ window.loom.onReelParams((p) => {
   if (typeof p.bubbleSizeFrac === 'number') bubbleSizeFrac = p.bubbleSizeFrac;
   if (typeof p.shape === 'string') shape = p.shape;
   if (typeof p.border === 'boolean') border = p.border;
+  if (typeof p.borderColor === 'string') borderColor = p.borderColor;
   if (typeof p.bubbleLocked === 'boolean') bubbleLocked = p.bubbleLocked;
   if (p.bubbleLockedRect !== undefined) bubbleLockedRect = p.bubbleLockedRect;
   if (typeof p.ytUrl === 'string') loadMedia(p.ytUrl, p.mediaKind || mediaKind);

@@ -6,6 +6,9 @@ const sourceSel = $('sourceSel');
 const cameraSel = $('cameraSel');
 const shapeSel = $('shapeSel');
 const borderChk = $('borderChk');
+const borderColorSel = $('borderColorSel');
+const borderHex = $('borderHex');
+const borderEyedrop = $('borderEyedrop');
 const micSel = $('micSel');
 const sysAudioChk = $('sysAudioChk');
 const qualitySel = $('qualitySel');
@@ -98,11 +101,53 @@ function applyCamera() {
   const shape = shapeSel.value;
   cameraSel.disabled = shape === 'none';
   borderChk.disabled = shape === 'none';
-  window.loom.updateCamera({ cameraId: cameraSel.value, shape, border: borderChk.checked });
+  const noBorderUi = shape === 'none' || !borderChk.checked;
+  borderColorSel.disabled = noBorderUi;
+  borderHex.disabled = noBorderUi;
+  borderEyedrop.disabled = noBorderUi;
+  window.loom.updateCamera({
+    cameraId: cameraSel.value, shape,
+    border: borderChk.checked, borderColor: borderColorSel.value,
+  });
 }
+
+// Normaliza un hex a #rrggbb (acepta sin #, y formato corto #rgb). Devuelve null si no es válido.
+function normalizeHex(v) {
+  v = String(v || '').trim().replace(/^#/, '');
+  if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split('').map((c) => c + c).join('');
+  return /^[0-9a-fA-F]{6}$/.test(v) ? '#' + v.toLowerCase() : null;
+}
+
+// Fija el color del borde y mantiene en sincronía los tres controles (picker, hex, cuentagotas).
+function setBorderColor(hex) {
+  const norm = normalizeHex(hex);
+  if (!norm) return;
+  borderColorSel.value = norm;
+  borderHex.value = norm;
+  applyCamera();
+}
+
 shapeSel.addEventListener('change', applyCamera);
 cameraSel.addEventListener('change', applyCamera);
 borderChk.addEventListener('change', applyCamera);
+borderColorSel.addEventListener('input', () => setBorderColor(borderColorSel.value));
+borderHex.addEventListener('input', () => {
+  const n = normalizeHex(borderHex.value);
+  if (n) { borderColorSel.value = n; applyCamera(); } // sin reescribir el texto mientras escribe
+});
+borderHex.addEventListener('change', () => setBorderColor(borderHex.value));
+
+// Cuentagotas: toma un color de CUALQUIER parte de la pantalla (API EyeDropper de Chromium).
+borderEyedrop.addEventListener('click', async () => {
+  if (typeof window.EyeDropper !== 'function') {
+    setStatus('El cuentagotas no está disponible en esta versión.', '');
+    return;
+  }
+  try {
+    const { sRGBHex } = await new EyeDropper().open();
+    if (sRGBHex) setBorderColor(sRGBHex);
+  } catch (_) { /* el usuario canceló (Esc) */ }
+});
 
 zoomRange.addEventListener('input', () => {
   zoomLbl.textContent = zoomRange.value + '%';

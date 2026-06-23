@@ -109,7 +109,8 @@ let lastSavedPath = null;   // último MP4 guardado (para subtítulos rápidos)
 
 let cameraId = '';          // Cámara seleccionada
 let cameraShape = 'circle'; // 'circle' | 'vertical' | 'wide' | 'none'
-let cameraBorder = true;    // ¿borde blanco alrededor de la cámara?
+let cameraBorder = true;    // ¿borde alrededor de la cámara?
+let cameraBorderColor = '#ffffff'; // color del borde de la cámara
 let webcamZoom = 1;         // zoom de la webcam (recorte central uniforme)
 let systemAudio = false;    // ¿capturar también el audio del sistema?
 
@@ -247,7 +248,7 @@ function createOverlayWindow(initRect = null) {
 
   // Enviar la configuración (cámara + forma + borde) cuando la ventana esté lista.
   overlayWindow.webContents.once('did-finish-load', () => {
-    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, zoom: webcamZoom });
+    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor, zoom: webcamZoom });
     sendWebcamRect();
   });
 
@@ -350,7 +351,7 @@ function markZoneRecording() {
 function reelPreviewSettings() {
   return {
     mode: 'reel', cameraId, bandPos, bandHeightFrac, cropRect, zoom: webcamZoom,
-    shape: cameraShape, border: cameraBorder,
+    shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor,
     reelHeadline, reelHeadlineOffset, reelHeadlinePos, bubbleSizeFrac,
     bubbleLocked, bubbleLockedRect, ytUrl: currentYtUrl(), mediaKind: reelMediaKind,
     systemAudio: false,
@@ -389,7 +390,7 @@ function hideReelPreview() {
 function podcastPreviewSettings() {
   return {
     mode: 'podcast', cameraId, zoom: webcamZoom,
-    shape: 'vertical', border: cameraBorder, systemAudio: false,
+    shape: 'vertical', border: cameraBorder, borderColor: cameraBorderColor, systemAudio: false,
   };
 }
 
@@ -413,7 +414,7 @@ function showPodcastPreview() {
 
 function sendReelParams() {
   if (recMode === 'reel' && recorderWindow) {
-    recorderWindow.webContents.send('reel-params', { bandPos, bandHeightFrac, cropRect, zoom: webcamZoom, reelHeadline, reelHeadlineOffset, reelHeadlinePos, bubbleSizeFrac, shape: cameraShape, border: cameraBorder, bubbleLocked, bubbleLockedRect, ytUrl: currentYtUrl(), mediaKind: reelMediaKind });
+    recorderWindow.webContents.send('reel-params', { bandPos, bandHeightFrac, cropRect, zoom: webcamZoom, reelHeadline, reelHeadlineOffset, reelHeadlinePos, bubbleSizeFrac, shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor, bubbleLocked, bubbleLockedRect, ytUrl: currentYtUrl(), mediaKind: reelMediaKind });
   }
 }
 
@@ -705,7 +706,7 @@ ipcMain.handle('start-recording', async (_e, settings) => {
   systemAudio = settings.systemAudio === true; // lo lee el handler de getDisplayMedia
   const full = {
     ...settings,
-    cameraId, shape: cameraShape, border: cameraBorder, zoom: webcamZoom,
+    cameraId, shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor, zoom: webcamZoom,
     mode: recMode, bandPos, bandHeightFrac, cropRect, ytUrl: currentYtUrl(), mediaKind: reelMediaKind,
   };
 
@@ -823,6 +824,7 @@ ipcMain.handle('update-camera', (_e, opts) => {
   cameraId = opts.cameraId || '';
   cameraShape = opts.shape || 'circle';
   cameraBorder = opts.border !== false;
+  if (typeof opts.borderColor === 'string') cameraBorderColor = opts.borderColor;
 
   // En reel con banda, en podcast (cámara integrada en el canvas), o "sin cámara":
   // ocultar la burbuja flotante porque no debe aparecer encima de la pantalla.
@@ -842,7 +844,7 @@ ipcMain.handle('update-camera', (_e, opts) => {
     if (cameraShape === 'vertical') w = Math.min(b.width, 240);
     else if (cameraShape === 'wide') w = Math.max(b.width, 280); // mínimo razonable para 16:9
     overlayWindow.setBounds({ x: b.x, y: b.y, width: w, height: Math.round(w * aspectFor(cameraShape)) });
-    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, zoom: webcamZoom });
+    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor, zoom: webcamZoom });
     overlayWindow.show();
   }
   snapOverlayToCorner();
@@ -891,7 +893,7 @@ ipcMain.on('set-reel', (_e, opts) => {
 ipcMain.on('set-zoom', (_e, z) => {
   webcamZoom = z || 1;
   if (overlayWindow) {
-    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, zoom: webcamZoom });
+    overlayWindow.webContents.send('overlay-config', { cameraId, shape: cameraShape, border: cameraBorder, borderColor: cameraBorderColor, zoom: webcamZoom });
   }
   // Reflejar el zoom en vivo en la vista previa del compositor (reel Y podcast).
   if (recorderWindow && !recorderWindow.isDestroyed()) {
