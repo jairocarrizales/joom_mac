@@ -177,6 +177,19 @@ function tracePath(x, y, w, h) {
     ctx.arcTo(x, y + h, x, y, r);
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
+  } else if (shape === 'card') {
+    // Squircle / superelipse (n≈4): esquinas continuas tipo iOS/macOS (no arcos).
+    const cx = x + w / 2, cy = y + h / 2, a = w / 2, b = h / 2;
+    const n = 4, N = 120, p = 2 / n;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const t = (i / N) * Math.PI * 2;
+      const ct = Math.cos(t), st = Math.sin(t);
+      const px = cx + a * Math.sign(ct) * Math.pow(Math.abs(ct), p);
+      const py = cy + b * Math.sign(st) * Math.pow(Math.abs(st), p);
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
   } else {
     const r = Math.min(w, h) / 2;
     ctx.beginPath();

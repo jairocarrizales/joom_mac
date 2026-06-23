@@ -138,15 +138,17 @@ const isFullCam = () => bandHeightFrac >= 0.98; // cámara ocupa todo (sin panta
 
 // Relación alto/ancho de la burbuja según la forma.
 function aspectFor(shape) {
-  // h/w → vertical 9:16 (1.778), círculo 1:1, wide 16:9 (0.5625)
+  // h/w → vertical 9:16 (1.778), círculo 1:1, wide 16:9 (0.5625), card 4:3 (0.75)
   if (shape === 'vertical') return 16 / 9;
   if (shape === 'wide') return 9 / 16;
+  if (shape === 'card') return 1; // cuadrado (squircle)
   return 1;
 }
 
 function defaultWidthFor(shape) {
   if (shape === 'vertical') return 200;
   if (shape === 'wide') return 320;
+  if (shape === 'card') return 260;
   return 220;
 }
 

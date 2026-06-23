@@ -29,9 +29,11 @@ async function startCamera(id) {
 window.loom.onOverlayConfig(({ cameraId, shape, border, zoom }) => {
   const vert = shape === 'vertical';
   const wide = shape === 'wide';
+  const card = shape === 'card';
   bubble.classList.toggle('vertical', vert);
   bubble.classList.toggle('wide', wide);
-  bubble.classList.toggle('circle', !vert && !wide);
+  bubble.classList.toggle('card', card);
+  bubble.classList.toggle('circle', !vert && !wide && !card);
   bubble.classList.toggle('noborder', border === false);
   // Zoom de cámara: escala uniforme (espejo + zoom) recortada por la burbuja.
   cam.style.transform = `scaleX(-1) scale(${zoom || 1})`;

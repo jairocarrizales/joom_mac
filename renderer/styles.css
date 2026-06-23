@@ -369,6 +369,9 @@ html.overlay, body.overlay { background: transparent !important; overflow: hidde
 .bubble.circle { border-radius: 50%; }
 .bubble.vertical { border-radius: 26px; }   /* retrato tipo móvil */
 .bubble.wide { border-radius: 18px; }       /* horizontal 16:9 */
+/* Tarjeta squircle (superelipse n≈4): esquinas continuas tipo iOS/macOS */
+.bubble.card { border-radius: 0; border: none; clip-path: polygon(100.00% 50.00%, 99.74% 68.86%, 98.98% 76.54%, 97.69% 82.23%, 95.86% 86.76%, 93.47% 90.46%, 90.46% 93.47%, 86.76% 95.86%, 82.23% 97.69%, 76.54% 98.98%, 68.86% 99.74%, 50.00% 100.00%, 31.14% 99.74%, 23.46% 98.98%, 17.77% 97.69%, 13.24% 95.86%, 9.54% 93.47%, 6.53% 90.46%, 4.14% 86.76%, 2.31% 82.23%, 1.02% 76.54%, 0.26% 68.86%, 0.00% 50.00%, 0.26% 31.14%, 1.02% 23.46%, 2.31% 17.77%, 4.14% 13.24%, 6.53% 9.54%, 9.54% 6.53%, 13.24% 4.14%, 17.77% 2.31%, 23.46% 1.02%, 31.14% 0.26%, 50.00% 0.00%, 68.86% 0.26%, 76.54% 1.02%, 82.23% 2.31%, 86.76% 4.14%, 90.46% 6.53%, 93.47% 9.54%, 95.86% 13.24%, 97.69% 17.77%, 98.98% 23.46%, 99.74% 31.14%); }
+.bubble.card video { border-radius: 0; }
 .bubble.noborder { border: none; box-shadow: none; }  /* sin marco blanco */
 .bubble:active { cursor: grabbing; }
 .bubble video {
