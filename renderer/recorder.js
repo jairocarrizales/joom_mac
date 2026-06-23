@@ -224,6 +224,17 @@ function tracePath(x, y, w, h) {
     ctx.bezierCurveTo(X(0.94), Y(0.74), X(0.76), Y(0.93), X(0.50), Y(0.985));
     ctx.bezierCurveTo(X(0.24), Y(0.93), X(0.06), Y(0.74), X(0.06), Y(0.46));
     ctx.closePath();
+  } else if (shape === 'arch') {
+    // Arco: lados rectos, base plana y top semicircular (con aspecto 1.15 el top
+    // queda circular). Mismo trazo que el clipPath SVG de la vista previa.
+    const X = (u) => x + u * w, Y = (v) => y + v * h;
+    const archY = 0.435;
+    ctx.beginPath();
+    ctx.moveTo(X(0), Y(1));
+    ctx.lineTo(X(0), Y(archY));
+    ctx.ellipse(X(0.5), Y(archY), 0.5 * w, archY * h, 0, Math.PI, 2 * Math.PI, false);
+    ctx.lineTo(X(1), Y(1));
+    ctx.closePath();
   } else if (shape && shape.indexOf('corner-') === 0) {
     // Cuarto de ELIPSE anclado a una esquina (radios = ancho y alto): llena toda
     // la caja, así la curva cubre todo el borde sin quedar recta en ninguna parte.
@@ -279,7 +290,7 @@ function drawWebcam() {
   if (mode === 'reel' && bandPos === 'bubble' && bubbleSizeFrac > 0) {
     const cx = x + w / 2, cy = y + h / 2;
     const newW = Math.round(cw * bubbleSizeFrac);
-    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : (shape === 'shield' ? 1.12 : (shape === 'shield2' ? 1.35 : 1)));
+    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : (shape === 'shield' ? 1.12 : (shape === 'shield2' ? 1.35 : (shape === 'arch' ? 1.15 : 1))));
     const newH = Math.round(newW * aspectH);
     x = cx - newW / 2;
     y = cy - newH / 2;

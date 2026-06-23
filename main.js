@@ -146,6 +146,7 @@ function aspectFor(shape) {
   if (shape === 'feather') return 1; // círculo difuminado (niebla)
   if (shape === 'shield') return 1.12; // escudo (algo más alto que ancho)
   if (shape === 'shield2') return 1.35; // escudo 2 (top plano, base curva; más alto)
+  if (shape === 'arch') return 1.15;    // arco (top semicircular ⇒ circular con 1.15)
   // 'corner-*' (esquinas): cuarto de círculo, cuadrado.
   return 1;
 }
@@ -158,6 +159,7 @@ function defaultWidthFor(shape) {
   if (shape === 'feather') return 240;
   if (shape === 'shield') return 230;
   if (shape === 'shield2') return 215;
+  if (shape === 'arch') return 220;
   if (shape && shape.indexOf('corner-') === 0) return 320;
   return 220;
 }

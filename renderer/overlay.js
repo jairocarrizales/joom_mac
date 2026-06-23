@@ -88,6 +88,7 @@ window.loom.onOverlayConfig(({ cameraId, shape, border, zoom }) => {
   const feather = shape === 'feather';
   const shield = shape === 'shield';
   const shield2 = shape === 'shield2';
+  const arch = shape === 'arch';
   const corner = shape.indexOf('corner-') === 0;
   bubble.classList.toggle('vertical', vert);
   bubble.classList.toggle('wide', wide);
@@ -96,8 +97,9 @@ window.loom.onOverlayConfig(({ cameraId, shape, border, zoom }) => {
   bubble.classList.toggle('feather', feather);
   bubble.classList.toggle('shield', shield);
   bubble.classList.toggle('shield2', shield2);
+  bubble.classList.toggle('arch', arch);
   bubble.classList.toggle('cornermode', corner);
-  bubble.classList.toggle('circle', !vert && !wide && !card && !pebble && !feather && !shield && !shield2 && !corner);
+  bubble.classList.toggle('circle', !vert && !wide && !card && !pebble && !feather && !shield && !shield2 && !arch && !corner);
   bubble.classList.toggle('noborder', border === false);
   // Zoom de cámara: escala uniforme (espejo + zoom) recortada por la burbuja.
   cam.style.transform = `scaleX(-1) scale(${zoom || 1})`;
