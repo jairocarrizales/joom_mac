@@ -380,6 +380,9 @@ html.overlay, body.overlay { background: transparent !important; overflow: hidde
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 60%, transparent 80%);
           mask-image: radial-gradient(circle at 50% 50%, #000 60%, transparent 80%); }
 .bubble.feather video { border-radius: 0; }
+/* Escudo: máscara via clipPath SVG en overlay.html */
+.bubble.shield { border-radius: 0; border: none; clip-path: url(#shield); }
+.bubble.shield video { border-radius: 0; }
 .bubble.noborder { border: none; box-shadow: none; }  /* sin marco blanco */
 .bubble:active { cursor: grabbing; }
 .bubble video {

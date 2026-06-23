@@ -203,6 +203,15 @@ function tracePath(x, y, w, h) {
       ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x + p2[0] * w, y + p2[1] * h);
     }
     ctx.closePath();
+  } else if (shape === 'shield') {
+    // Escudo/crest: curva Bézier simétrica (hombros redondeados + punta inferior).
+    const X = (u) => x + u * w, Y = (v) => y + v * h;
+    ctx.beginPath();
+    ctx.moveTo(X(0.10), Y(0.12));
+    ctx.bezierCurveTo(X(0.30), Y(0.07), X(0.70), Y(0.07), X(0.90), Y(0.12));
+    ctx.bezierCurveTo(X(0.95), Y(0.42), X(0.82), Y(0.80), X(0.50), Y(0.96));
+    ctx.bezierCurveTo(X(0.18), Y(0.80), X(0.05), Y(0.42), X(0.10), Y(0.12));
+    ctx.closePath();
   } else {
     const r = Math.min(w, h) / 2;
     ctx.beginPath();
@@ -242,7 +251,7 @@ function drawWebcam() {
   if (mode === 'reel' && bandPos === 'bubble' && bubbleSizeFrac > 0) {
     const cx = x + w / 2, cy = y + h / 2;
     const newW = Math.round(cw * bubbleSizeFrac);
-    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : 1);
+    const aspectH = shape === 'vertical' ? (16 / 9) : (shape === 'wide' ? (9 / 16) : (shape === 'shield' ? 1.12 : 1));
     const newH = Math.round(newW * aspectH);
     x = cx - newW / 2;
     y = cy - newH / 2;
