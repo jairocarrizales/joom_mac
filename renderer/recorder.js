@@ -190,6 +190,19 @@ function tracePath(x, y, w, h) {
       if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
     }
     ctx.closePath();
+  } else if (shape === 'pebble') {
+    // Canto rodado: curva orgánica asimétrica (Catmull-Rom -> Bézier), normalizada 0..1.
+    const P = [[0.97, 0.5], [0.7466, 0.8522], [0.3202, 0.945], [0.1196, 0.6236], [0.1016, 0.27], [0.4457, 0.1138], [0.8011, 0.1656]];
+    const n = P.length;
+    ctx.beginPath();
+    ctx.moveTo(x + P[0][0] * w, y + P[0][1] * h);
+    for (let i = 0; i < n; i++) {
+      const p0 = P[(i - 1 + n) % n], p1 = P[i], p2 = P[(i + 1) % n], p3 = P[(i + 2) % n];
+      const c1x = x + (p1[0] + (p2[0] - p0[0]) / 6) * w, c1y = y + (p1[1] + (p2[1] - p0[1]) / 6) * h;
+      const c2x = x + (p2[0] - (p3[0] - p1[0]) / 6) * w, c2y = y + (p2[1] - (p3[1] - p1[1]) / 6) * h;
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, x + p2[0] * w, y + p2[1] * h);
+    }
+    ctx.closePath();
   } else {
     const r = Math.min(w, h) / 2;
     ctx.beginPath();
@@ -197,6 +210,9 @@ function tracePath(x, y, w, h) {
     ctx.closePath();
   }
 }
+
+// Lienzo auxiliar para la forma "difuminada" (máscara alfa radial).
+const featherCanvas = document.createElement('canvas');
 
 // Dibuja la webcam recortada a la forma (cover + espejo), con borde blanco.
 function drawWebcam() {
@@ -241,6 +257,31 @@ function drawWebcam() {
   const dh = vh * scale;
   const cx = x + w / 2;
   const cy = y + h / 2;
+
+  // Círculo difuminado (niebla): el borde se desvanece con una máscara alfa
+  // radial, así la cámara se funde con el fondo en vez de verse "pegada".
+  if (shape === 'feather') {
+    const oc = featherCanvas;
+    oc.width = Math.max(2, Math.round(w));
+    oc.height = Math.max(2, Math.round(h));
+    const octx = oc.getContext('2d');
+    octx.clearRect(0, 0, oc.width, oc.height);
+    octx.save();
+    octx.translate(oc.width / 2, oc.height / 2);
+    octx.scale(-1, 1);
+    octx.drawImage(webcamVideo, -dw / 2, -dh / 2, dw, dh);
+    octx.restore();
+    octx.globalCompositeOperation = 'destination-in';
+    const rad = Math.min(oc.width, oc.height) / 2;
+    const g = octx.createRadialGradient(oc.width / 2, oc.height / 2, rad * 0.62, oc.width / 2, oc.height / 2, rad);
+    g.addColorStop(0, 'rgba(0,0,0,1)');
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    octx.fillStyle = g;
+    octx.fillRect(0, 0, oc.width, oc.height);
+    octx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(oc, x, y);
+    return;
+  }
 
   ctx.save();
   tracePath(x, y, w, h);

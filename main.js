@@ -142,6 +142,8 @@ function aspectFor(shape) {
   if (shape === 'vertical') return 16 / 9;
   if (shape === 'wide') return 9 / 16;
   if (shape === 'card') return 1; // cuadrado (squircle)
+  if (shape === 'pebble') return 1; // canto rodado (orgánica)
+  if (shape === 'feather') return 1; // círculo difuminado (niebla)
   return 1;
 }
 
@@ -149,6 +151,8 @@ function defaultWidthFor(shape) {
   if (shape === 'vertical') return 200;
   if (shape === 'wide') return 320;
   if (shape === 'card') return 260;
+  if (shape === 'pebble') return 270;
+  if (shape === 'feather') return 240;
   return 220;
 }
 
