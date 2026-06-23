@@ -9,6 +9,7 @@ const borderChk = $('borderChk');
 const borderSwatches = Array.from(document.querySelectorAll('#borderSwatches .bsw'));
 const borderHex = $('borderHex');
 const borderEyedrop = $('borderEyedrop');
+const borderPickerBtn = $('borderPickerBtn');
 const borderWidth = $('borderWidth');
 let borderColor = '#ffffff';
 const micSel = $('micSel');
@@ -106,8 +107,10 @@ function applyCamera() {
   const off = shape === 'none' || !borderChk.checked;
   borderHex.disabled = off;
   borderEyedrop.disabled = off;
+  borderPickerBtn.disabled = off;
   borderWidth.disabled = off;
   borderSwatches.forEach((b) => { b.disabled = off; });
+  if (off) borderPicker.hidden = true;
   window.loom.updateCamera({
     cameraId: cameraSel.value, shape,
     border: borderChk.checked, borderColor,
@@ -162,6 +165,89 @@ borderEyedrop.addEventListener('click', async () => {
     const { sRGBHex } = await new EyeDropper().open();
     if (sRGBHex) setBorderColor(sRGBHex);
   } catch (_) { /* el usuario canceló (Esc) */ }
+});
+
+// --- Mapa de colores (popover HSV navegable) --------------------------------
+const borderPicker = $('borderPicker');
+const cpSV = $('cpSV');
+const cpHue = $('cpHue');
+const cpCtx = cpSV.getContext('2d');
+let cpH = 0, cpS = 1, cpV = 1; // estado HSV del selector
+
+function hsvToRgb(h, s, v) {
+  const c = v * s, x = c * (1 - Math.abs(((h / 60) % 2) - 1)), m = v - c;
+  let r, g, b;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
+}
+function rgbToHsv(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d) {
+    if (max === r) h = 60 * ((((g - b) / d) % 6 + 6) % 6);
+    else if (max === g) h = 60 * ((b - r) / d + 2);
+    else h = 60 * ((r - g) / d + 4);
+  }
+  return [h, max ? d / max : 0, max];
+}
+function hsvToHex(h, s, v) {
+  return '#' + hsvToRgb(h, s, v).map((n) => n.toString(16).padStart(2, '0')).join('');
+}
+
+function drawSV() {
+  const w = cpSV.width, h = cpSV.height;
+  const base = cpCtx.createLinearGradient(0, 0, w, 0);
+  base.addColorStop(0, '#ffffff');
+  base.addColorStop(1, hsvToHex(cpH, 1, 1));
+  cpCtx.fillStyle = base; cpCtx.fillRect(0, 0, w, h);
+  const dark = cpCtx.createLinearGradient(0, 0, 0, h);
+  dark.addColorStop(0, 'rgba(0,0,0,0)');
+  dark.addColorStop(1, 'rgba(0,0,0,1)');
+  cpCtx.fillStyle = dark; cpCtx.fillRect(0, 0, w, h);
+  // Marcador de la posición actual.
+  const mx = cpS * w, my = (1 - cpV) * h;
+  cpCtx.beginPath(); cpCtx.arc(mx, my, 6, 0, Math.PI * 2);
+  cpCtx.lineWidth = 2; cpCtx.strokeStyle = '#fff'; cpCtx.stroke();
+  cpCtx.beginPath(); cpCtx.arc(mx, my, 6.5, 0, Math.PI * 2);
+  cpCtx.lineWidth = 1; cpCtx.strokeStyle = 'rgba(0,0,0,0.5)'; cpCtx.stroke();
+}
+
+function pickSV(e) {
+  const r = cpSV.getBoundingClientRect();
+  cpS = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  cpV = Math.min(1, Math.max(0, 1 - (e.clientY - r.top) / r.height));
+  drawSV();
+  setBorderColor(hsvToHex(cpH, cpS, cpV));
+}
+
+let cpDragging = false;
+cpSV.addEventListener('mousedown', (e) => { cpDragging = true; pickSV(e); });
+window.addEventListener('mousemove', (e) => { if (cpDragging) pickSV(e); });
+window.addEventListener('mouseup', () => { cpDragging = false; });
+cpHue.addEventListener('input', () => { cpH = parseFloat(cpHue.value) || 0; drawSV(); setBorderColor(hsvToHex(cpH, cpS, cpV)); });
+
+borderPickerBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const opening = borderPicker.hidden;
+  borderPicker.hidden = !opening;
+  if (opening) {
+    const n = normalizeHex(borderColor) || '#ffffff';
+    [cpH, cpS, cpV] = rgbToHsv(parseInt(n.slice(1, 3), 16), parseInt(n.slice(3, 5), 16), parseInt(n.slice(5, 7), 16));
+    cpHue.value = Math.round(cpH);
+    drawSV();
+  }
+});
+// Cerrar al hacer clic fuera del popover.
+document.addEventListener('click', (e) => {
+  if (!borderPicker.hidden && !borderPicker.contains(e.target) && !borderPickerBtn.contains(e.target)) {
+    borderPicker.hidden = true;
+  }
 });
 
 zoomRange.addEventListener('input', () => {
