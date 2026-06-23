@@ -6,11 +6,9 @@ const sourceSel = $('sourceSel');
 const cameraSel = $('cameraSel');
 const shapeSel = $('shapeSel');
 const borderChk = $('borderChk');
-const borderSwatches = Array.from(document.querySelectorAll('#borderSwatches .bsw'));
+const borderColorSel = $('borderColorSel');
 const borderHex = $('borderHex');
 const borderEyedrop = $('borderEyedrop');
-const borderWidth = $('borderWidth');
-let borderColor = '#ffffff';
 const micSel = $('micSel');
 const sysAudioChk = $('sysAudioChk');
 const qualitySel = $('qualitySel');
@@ -103,15 +101,13 @@ function applyCamera() {
   const shape = shapeSel.value;
   cameraSel.disabled = shape === 'none';
   borderChk.disabled = shape === 'none';
-  const off = shape === 'none' || !borderChk.checked;
-  borderHex.disabled = off;
-  borderEyedrop.disabled = off;
-  borderWidth.disabled = off;
-  borderSwatches.forEach((b) => { b.disabled = off; });
+  const noBorderUi = shape === 'none' || !borderChk.checked;
+  borderColorSel.disabled = noBorderUi;
+  borderHex.disabled = noBorderUi;
+  borderEyedrop.disabled = noBorderUi;
   window.loom.updateCamera({
     cameraId: cameraSel.value, shape,
-    border: borderChk.checked, borderColor,
-    borderWidth: parseFloat(borderWidth.value) || 2,
+    border: borderChk.checked, borderColor: borderColorSel.value,
   });
 }
 
@@ -122,35 +118,24 @@ function normalizeHex(v) {
   return /^[0-9a-fA-F]{6}$/.test(v) ? '#' + v.toLowerCase() : null;
 }
 
-function markActiveSwatch(hex) {
-  borderSwatches.forEach((b) => b.classList.toggle('active', (b.dataset.color || '').toLowerCase() === hex));
-}
-
-// Fija el color del borde y sincroniza swatches + campo hex.
+// Fija el color del borde y mantiene en sincronía los tres controles (picker, hex, cuentagotas).
 function setBorderColor(hex) {
   const norm = normalizeHex(hex);
   if (!norm) return;
-  borderColor = norm;
+  borderColorSel.value = norm;
   borderHex.value = norm;
-  markActiveSwatch(norm);
   applyCamera();
 }
 
 shapeSel.addEventListener('change', applyCamera);
 cameraSel.addEventListener('change', applyCamera);
 borderChk.addEventListener('change', applyCamera);
-borderWidth.addEventListener('input', applyCamera);
-borderSwatches.forEach((b) => b.addEventListener('click', () => setBorderColor(b.dataset.color)));
-// Escribir hex: aplica en vivo si es válido, sin reescribir el texto mientras tecleas.
+borderColorSel.addEventListener('input', () => setBorderColor(borderColorSel.value));
 borderHex.addEventListener('input', () => {
   const n = normalizeHex(borderHex.value);
-  if (n) { borderColor = n; markActiveSwatch(n); applyCamera(); }
+  if (n) { borderColorSel.value = n; applyCamera(); } // sin reescribir el texto mientras escribe
 });
-borderHex.addEventListener('change', () => {
-  const n = normalizeHex(borderHex.value);
-  if (n) setBorderColor(n);
-  else borderHex.value = borderColor; // revertir basura al último color válido
-});
+borderHex.addEventListener('change', () => setBorderColor(borderHex.value));
 
 // Cuentagotas: toma un color de CUALQUIER parte de la pantalla (API EyeDropper de Chromium).
 borderEyedrop.addEventListener('click', async () => {

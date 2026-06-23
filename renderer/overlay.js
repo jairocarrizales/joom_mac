@@ -80,7 +80,7 @@ async function startCamera(id) {
 }
 
 // Configuración (forma + borde + cámara) desde el proceso principal.
-window.loom.onOverlayConfig(({ cameraId, shape, border, borderColor, zoom }) => {
+window.loom.onOverlayConfig(({ cameraId, shape, border, borderColor, borderWidth, zoom }) => {
   const vert = shape === 'vertical';
   const wide = shape === 'wide';
   const card = shape === 'card';
@@ -101,8 +101,9 @@ window.loom.onOverlayConfig(({ cameraId, shape, border, borderColor, zoom }) => 
   bubble.classList.toggle('cornermode', corner);
   bubble.classList.toggle('circle', !vert && !wide && !card && !pebble && !feather && !shield && !shield2 && !arch && !corner);
   bubble.classList.toggle('noborder', border === false);
-  // Color del borde (aplica a las formas con borde CSS: círculo/vertical/wide).
+  // Color y grosor del borde (formas con borde CSS: círculo/vertical/wide).
   if (borderColor) bubble.style.borderColor = borderColor;
+  bubble.style.borderWidth = Math.max(1, Math.round((borderWidth || 2) * 1.5)) + 'px';
   // Zoom de cámara: escala uniforme (espejo + zoom) recortada por la burbuja.
   cam.style.transform = `scaleX(-1) scale(${zoom || 1})`;
   curZoom = zoom || 1;
