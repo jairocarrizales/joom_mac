@@ -36,21 +36,19 @@ if (!ffmpegPath || !fs.existsSync(ffmpegPath)) ffmpegPath = 'ffmpeg';
 //
 // En macOS las apps GUI NO heredan el PATH del shell (no traen /opt/homebrew/bin
 // ni /usr/local/bin), así que resolvemos la ruta absoluta a mano.
-let ytDlpPath = 'yt-dlp';
-{
+function resolveYtDlp() {
   const isWin = process.platform === 'win32';
   const bundled = path
     .join(__dirname, 'bin', isWin ? 'yt-dlp.exe' : 'yt-dlp')
     .replace('app.asar', 'app.asar.unpacked');
-  if (fs.existsSync(bundled)) {
-    ytDlpPath = bundled;
-  } else if (isWin) {
+  if (fs.existsSync(bundled)) return bundled;
+  if (isWin) {
     // Node en Windows no aplica PATHEXT al hacer spawn de un comando sin extensión,
     // así que resolvemos la ruta absoluta de yt-dlp.exe del PATH.
     try {
       const out = require('child_process').execSync('where yt-dlp', { encoding: 'utf8' });
       const exe = out.split(/\r?\n/).map((l) => l.trim()).find((l) => /\.exe$/i.test(l));
-      if (exe) ytDlpPath = exe;
+      if (exe) return exe;
     } catch (_) { /* no instalado; la descarga avisará */ }
   } else {
     // macOS / Linux: probamos las rutas típicas de Homebrew / pipx / sistema.
@@ -63,18 +61,27 @@ let ytDlpPath = 'yt-dlp';
       path.join(home, 'bin', 'yt-dlp'),
     ];
     const found = candidates.find((p) => { try { return fs.existsSync(p); } catch (_) { return false; } });
-    if (found) {
-      ytDlpPath = found;
-    } else {
-      // Último intento: `command -v` con un PATH ampliado por si la app lo heredó.
-      try {
-        const env = { ...process.env, PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ''}` };
-        const out = require('child_process').execSync('command -v yt-dlp', { encoding: 'utf8', env, shell: '/bin/sh' });
-        const p = out.trim().split(/\r?\n/)[0];
-        if (p) ytDlpPath = p;
-      } catch (_) { /* no instalado; la descarga avisará */ }
-    }
+    if (found) return found;
+    // Último intento: `command -v` con un PATH ampliado por si la app lo heredó.
+    try {
+      const env = { ...process.env, PATH: `/opt/homebrew/bin:/usr/local/bin:${process.env.PATH || ''}` };
+      const out = require('child_process').execSync('command -v yt-dlp', { encoding: 'utf8', env, shell: '/bin/sh' });
+      const p = out.trim().split(/\r?\n/)[0];
+      if (p) return p;
+    } catch (_) { /* no instalado; la descarga avisará */ }
   }
+  return 'yt-dlp'; // bare command (puede no resolverse en apps GUI de macOS)
+}
+
+let ytDlpPath = resolveYtDlp();
+
+// ¿Hay un yt-dlp utilizable? Re-resuelve por si el usuario lo instaló con la app
+// abierta (así no hace falta reiniciar). Devuelve la ruta o null.
+function ensureYtDlp() {
+  if (ytDlpPath && ytDlpPath !== 'yt-dlp' && fs.existsSync(ytDlpPath)) return ytDlpPath;
+  ytDlpPath = resolveYtDlp();
+  if (ytDlpPath && ytDlpPath !== 'yt-dlp' && fs.existsSync(ytDlpPath)) return ytDlpPath;
+  return null;
 }
 
 // --- Estado global -----------------------------------------------------------
@@ -1029,6 +1036,10 @@ ipcMain.handle('yt-download', async (_e, url) => {
     return { ok: false, error: 'Pega una URL válida de YouTube (http/https).' };
   }
   const send = (m) => controlWindow && controlWindow.webContents.send('yt-progress', m);
+  const ytdlp = ensureYtDlp();
+  if (!ytdlp) {
+    return { ok: false, error: 'yt-dlp no está instalado. Ábrelo en Terminal con: brew install yt-dlp (luego reintenta).' };
+  }
   const out = path.join(os.tmpdir(), `joom-yt-${Date.now()}.mp4`);
   const args = [
     '-f', 'bv*[height<=720]+ba/b[height<=720]/b',
@@ -1041,7 +1052,7 @@ ipcMain.handle('yt-download', async (_e, url) => {
   send('Iniciando descarga…');
   return new Promise((resolve) => {
     let proc;
-    try { proc = spawn(ytDlpPath, args); }
+    try { proc = spawn(ytdlp, args); }
     catch (e) { resolve({ ok: false, error: 'No se pudo ejecutar yt-dlp: ' + e.message }); return; }
     let err = '';
     const onData = (d) => {
