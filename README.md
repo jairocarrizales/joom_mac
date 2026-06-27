@@ -1,75 +1,92 @@
-# Joom 🎥 (macOS)
+# Joom 🎥
 
-Grabador de pantalla + webcam para **macOS**, mínimo y directo. Port de la versión
-de Windows con **las mismas funcionalidades**, adaptado a Mac (permisos, conversión
-de PowerPoint y resolución de binarios).
+Grabador de pantalla + webcam para **macOS**, mínimo y directo. Graba pantalla y
+cámara compuestas en tiempo real, con formas de cámara, borde de color, barra de
+anotaciones para presentar y modos reel/podcast.
 
-Construido con **Electron**. La pantalla y la webcam se componen en tiempo real en
-un `<canvas>` y se graban con `MediaRecorder`; al detener, `ffmpeg` convierte a MP4
-(H.264 + AAC, listo para web).
+Construido con **Electron**. La pantalla y la webcam se componen en un `<canvas>` y
+se graban con `MediaRecorder` en **MP4 / H.264 por hardware (VideoToolbox)**, así la
+grabación va siempre en tiempo real. Al detener, `ffmpeg` deja el MP4 listo para web.
 
-## Qué hace
+---
 
-- **Tres modos de grabación:**
-  - **Pantalla completa** (horizontal) con la webcam como burbuja flotante.
-  - **Reel vertical** (9:16, resultado 1080×1920) con la cámara en banda, en
-    burbuja o a pantalla completa, y un texto/banner opcional.
-  - **Pantalla + cámara vertical** (podcast): la pantalla a la izquierda y la
-    cámara vertical a la derecha.
-- **Formas de cámara:** círculo, vertical (móvil), horizontal 16:9 o **sin cámara**.
-- **Barra de presentación** mientras grabas: puntero **láser**, dibujar
-  **rectángulos**, **flechas**, **números** y **confeti** 🎉, con colores y grosor.
-- **Reel con medios:** vídeo de YouTube (vía `yt-dlp`), vídeo local, o
-  presentación (PDF / PowerPoint / Google Slides) navegable durante la grabación.
-- Selector de **calidad** (720p/1080p/1080p60/1440p), **micrófono** y **audio del sistema**.
-- Botón para traer la **cámara al frente** y vista previa en vivo opcional.
+## Instalación rápida
 
-## Requisitos
+Necesitas **macOS 12+** (Apple Silicon o Intel) y **Node.js 18+**.
 
-- macOS 12+ (Apple Silicon o Intel)
-- Node.js 18+
-- `ffmpeg` se incluye vía `ffmpeg-static` (con respaldo al `ffmpeg` del PATH)
+```bash
+# 1) Clona el proyecto
+git clone https://github.com/jairocarrizales/joom_mac.git
+cd joom_mac
 
-### Dependencias opcionales (por función)
+# 2) Instala dependencias (baja Electron + ffmpeg nativo de tu Mac)
+npm install
+
+# 3) (Opcional) para usar vídeos de YouTube en el reel
+brew install yt-dlp
+
+# 4) Arranca
+npm start
+```
+
+> **¿No tienes Homebrew?** Instálalo con:
+> `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+
+La primera vez, macOS pedirá permiso de **Cámara** y **Micrófono**. Para grabar la
+pantalla hay que concederlo a mano una vez:
+
+> **Ajustes del Sistema → Privacidad y seguridad → Grabación de pantalla** → activa
+> **Joom** (o **Electron** en desarrollo) y reinicia la app.
+
+### Dependencias opcionales (solo si usas esas funciones)
 
 | Función | Necesitas | Instalar |
 |---|---|---|
 | Reel con vídeo de **YouTube** | `yt-dlp` | `brew install yt-dlp` |
-| Reel con **PowerPoint** (`.pptx`/`.ppt`) | **LibreOffice** o **Keynote** | `brew install --cask libreoffice` |
+| Reel con **PowerPoint** (`.pptx`/`.ppt`) | LibreOffice (o Keynote) | `brew install --cask libreoffice` |
 
-> La grabación, la cámara, el reel con vídeo/PDF local y Google Slides funcionan
-> sin instalar nada extra. `yt-dlp` solo hace falta si pegas una URL de YouTube;
-> la app detecta el binario al vuelo (no requiere reiniciar) y avisa si falta.
+La grabación, la cámara, el reel con vídeo/PDF local y Google Slides funcionan sin
+instalar nada extra. Joom detecta `yt-dlp` al vuelo (no hace falta reiniciar) y
+avisa si falta.
 
-### Configuración recomendada (la que se usó para validar)
+---
 
-```bash
-brew install yt-dlp                 # vídeos de YouTube en el reel
-brew install --cask libreoffice    # PowerPoint -> PDF (opcional)
-npm install                        # baja Electron + ffmpeg (binario nativo de tu Mac)
-```
+## Funciones
 
-## Grabación
+### Modos de grabación
+- **Pantalla completa** (horizontal) con la webcam como burbuja flotante.
+- **Reel vertical** (9:16 → 1080×1920) con la cámara en banda, en burbuja o a
+  pantalla completa, y un texto/banner opcional.
+- **Pantalla + cámara vertical** (podcast): pantalla a la izquierda, cámara
+  vertical a la derecha.
 
-La pantalla + webcam se componen en un `<canvas>` y se graban con `MediaRecorder`
-en **MP4 / H.264 usando el codificador por hardware de macOS (VideoToolbox)**, así
-la grabación va siempre en tiempo real (sin cámara lenta). Al detener, `ffmpeg`
-solo reempaqueta a MP4 listo para web (`+faststart`), sin recodificar.
+### Cámara
+- **Formas:** Círculo, Vertical (móvil), Horizontal 16:9, **SuperElipse**, **Pebble**
+  (orgánica), **Círculo difuminado** (niebla), **Escudo 1**, **Escudo 2**, **Arco**,
+  **Esquina** (las 4 posiciones) o **sin cámara**.
+- **Borde con color, activable o no:**
+  - Paleta de colores rápidos.
+  - Campo **hexadecimal** (`#ff3b30`, `#f33` o sin `#`).
+  - **Cuentagotas** 🎨 que toma un color de cualquier parte de la pantalla.
+  - **Mapa de color** (espectro HSV) navegable para elegir cualquier tono.
+  - Control de **grosor** del borde.
+- **Zoom** de la webcam y botón para traer la **cámara al frente**.
 
-## Permisos de macOS
+### Reel con medios
+Carga contenido y navégalo durante la grabación:
+- **Vídeo de YouTube** (descargado con `yt-dlp`).
+- **Vídeo local** de tu Mac.
+- **Presentación**: PDF, PowerPoint (→ PDF con LibreOffice/Keynote) o **Google Slides**.
 
-La primera vez la app pedirá acceso a **Cámara** y **Micrófono**. Para la captura
-de pantalla, macOS exige conceder **Grabación de pantalla** manualmente:
+### Barra de presentación (mientras grabas)
+Puntero **láser**, **rectángulos**, **flechas**, **números** y **confeti** 🎉, con
+color y grosor configurables.
 
-> Ajustes del Sistema → Privacidad y seguridad → **Grabación de pantalla** →
-> activa **Joom** (o **Electron** si lo ejecutas en desarrollo) y reinicia la app.
+### Audio y calidad
+- Selector de **calidad**: 720p / 1080p / 1080p60 / 1440p.
+- **Micrófono** y **audio del sistema** (opcional).
 
-## Uso
-
-```bash
-npm install
-npm start
-```
+---
 
 ## Atajos de teclado
 
@@ -81,6 +98,13 @@ npm start
 | `Ctrl+Shift+L` | Activar/desactivar láser |
 | `Ctrl+Shift+C` | Confeti 🎉 |
 
+---
+
+## Salida
+
+Al **Detener** se abre un diálogo para guardar el `.mp4` (por defecto en *Vídeos*).
+Vídeo: H.264, `yuv420p`, `+faststart`. Audio: micrófono (+ sistema si lo activas).
+
 ## Compilar un instalador
 
 ```bash
@@ -89,33 +113,21 @@ npm run dist
 
 Genera un `.dmg` y un `.zip` (arm64 + x64) en `dist/` con `electron-builder --mac`.
 
-> Nota: las apps no firmadas requieren el primer arranque con clic derecho → Abrir,
-> o ejecutar `xattr -dr com.apple.quarantine "/Applications/Joom.app"`.
+> Si la app no está firmada con tu cuenta, el primer arranque puede requerir
+> clic derecho → **Abrir**, o ejecutar:
+> `xattr -dr com.apple.quarantine "/Applications/Joom.app"`
 
-## Cómo funciona (arquitectura)
+## Arquitectura
 
 | Ventana | Archivo | Rol |
 |---|---|---|
-| Panel de control | `renderer/control.*` | Elegir modo/pantalla/cámara/mic, calidad, opciones de reel, botón de grabar |
-| Burbuja flotante | `renderer/overlay.*` | Webcam *always-on-top*, arrastrable y redimensionable. `setContentProtection(true)` la excluye de la captura |
-| Compositor (oculto) | `renderer/recorder.*` | Compone pantalla + webcam en un canvas, graba con `MediaRecorder`, transmite chunks a disco |
-| Barra de grabación | `renderer/recbar.*` | Pausa/detener + herramientas de anotación para presentar |
-| Capa de anotaciones | `renderer/annotate.*` | Láser, rectángulos, flechas, números y confeti sobre la pantalla |
+| Panel de control | `renderer/control.*` | Modo, pantalla, cámara/forma/borde, mic, calidad, opciones de reel, grabar |
+| Burbuja flotante | `renderer/overlay.*` | Webcam *always-on-top*; excluida de la captura con `setContentProtection` |
+| Compositor (oculto) | `renderer/recorder.*` | Compone pantalla + webcam en canvas, graba con `MediaRecorder` |
+| Barra de grabación | `renderer/recbar.*` | Pausa/detener + herramientas de anotación |
+| Capa de anotaciones | `renderer/annotate.*` | Láser, formas, números y confeti sobre la pantalla |
 | Selector de zona | `renderer/region.*` | Recuadro de pantalla a mostrar en el reel |
-| Proceso principal | `main.js` | Ventanas, IPC, fuente de pantalla, transcodificación a MP4 con ffmpeg |
-
-## Diferencias respecto a la versión de Windows
-
-Mismas funcionalidades; solo cambia lo dependiente del sistema:
-
-- **Permisos:** se solicitan cámara/micrófono con la API de macOS y se documenta el
-  permiso de Grabación de pantalla (TCC).
-- **PowerPoint → PDF:** en lugar de automatizar PowerPoint por COM, se usa
-  **LibreOffice** (`soffice --headless`) y, si no está, **Keynote** (AppleScript).
-- **yt-dlp:** se resuelve la ruta absoluta del binario (Homebrew/pipx), porque las
-  apps GUI de macOS no heredan el `PATH` del shell.
-- **Empaquetado:** `electron-builder --mac` (DMG/ZIP) con *hardened runtime* y
-  entitlements de cámara/micrófono.
+| Proceso principal | `main.js` | Ventanas, IPC, fuente de pantalla, ffmpeg, yt-dlp, conversión de presentaciones |
 
 ## Licencia
 
