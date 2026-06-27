@@ -10,9 +10,21 @@ grabación va siempre en tiempo real. Al detener, `ffmpeg` deja el MP4 listo par
 
 ## Capturas
 
-| Panel de control | Borde de cámara con mapa de color |
+| Cámara: forma + borde de color | Borde: mapa de color (HSV) |
 |---|---|
 | ![Panel de control de Joom](screenshots/panel.png) | ![Selector de color del borde](screenshots/mapa-de-colores.png) |
+
+| Modo reel (vídeo / presentación) | Subtítulos (estilos + IA) |
+|---|---|
+| ![Modo reel](screenshots/reel.png) | ![Subtítulos](screenshots/subtitulos.png) |
+
+**Barra de anotaciones** mientras grabas — láser, rectángulo, flecha, **números**, **confeti**, colores y grosor:
+
+![Barra de anotaciones](screenshots/barra-anotaciones.png)
+
+**Teleprompter** flotante (guion desplazable con control de velocidad y tamaño):
+
+![Teleprompter](screenshots/teleprompter.png)
 
 ---
 
@@ -87,6 +99,15 @@ Carga contenido y navégalo durante la grabación:
 ### Barra de presentación (mientras grabas)
 Puntero **láser**, **rectángulos**, **flechas**, **números** y **confeti** 🎉, con
 color y grosor configurables.
+
+### Teleprompter
+Guion flotante y desplazable para leer mientras miras a la cámara, con control de
+**velocidad** y **tamaño** de texto.
+
+### Subtítulos automáticos
+Genera subtítulos del audio con **Groq** (Whisper) y los **quema** en una copia
+`…-subs.mp4`, con varios **estilos** (POP/Reel, Caja, Manuscrita, Clásico…) y
+corrección opcional del texto con IA. Requiere una API key gratuita de Groq.
 
 ### Audio y calidad
 - Selector de **calidad**: 720p / 1080p / 1080p60 / 1440p.
