@@ -32,7 +32,26 @@ grabación va siempre en tiempo real. Al detener, `ffmpeg` deja el MP4 listo par
 
 ---
 
-## Instalación rápida
+## Vídeo
+
+[![Ver Joom en acción](https://img.youtube.com/vi/Jxxmi5V2TsM/hqdefault.jpg)](https://youtu.be/Jxxmi5V2TsM)
+
+---
+
+## Descarga directa (sin instalar nada)
+
+¿Solo quieres usar la app? Descarga el instalador desde
+**[Releases](https://github.com/jairocarrizales/joom_mac/releases/latest)**:
+
+- **Apple Silicon** (M1/M2/M3/M4) → `Joom-0.1.0-arm64.dmg`
+- **Intel** → `Joom-0.1.0-x64.dmg`
+
+Ábrelo, arrastra **Joom** a Aplicaciones y la primera vez ábrela con **clic derecho → Abrir**
+(la app está firmada pero no notarizada).
+
+---
+
+## Instalación rápida (desde el código)
 
 Necesitas **macOS 12+** (Apple Silicon o Intel) y **Node.js 18+**.
 
