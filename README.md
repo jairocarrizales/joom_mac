@@ -8,6 +8,12 @@ Construido con **Electron**. La pantalla y la webcam se componen en un `<canvas>
 se graban con `MediaRecorder` en **MP4 / H.264 por hardware (VideoToolbox)**, así la
 grabación va siempre en tiempo real. Al detener, `ffmpeg` deja el MP4 listo para web.
 
+## Capturas
+
+| Panel de control | Borde de cámara con mapa de color |
+|---|---|
+| ![Panel de control de Joom](screenshots/panel.png) | ![Selector de color del borde](screenshots/mapa-de-colores.png) |
+
 ---
 
 ## Instalación rápida
@@ -128,6 +134,10 @@ Genera un `.dmg` y un `.zip` (arm64 + x64) en `dist/` con `electron-builder --ma
 | Capa de anotaciones | `renderer/annotate.*` | Láser, formas, números y confeti sobre la pantalla |
 | Selector de zona | `renderer/region.*` | Recuadro de pantalla a mostrar en el reel |
 | Proceso principal | `main.js` | Ventanas, IPC, fuente de pantalla, ffmpeg, yt-dlp, conversión de presentaciones |
+
+## Contacto
+
+**Jairo Carrizales** — WhatsApp: [+52 826 158 2103](https://wa.me/528261582103)
 
 ## Licencia
 
