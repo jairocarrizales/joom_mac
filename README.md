@@ -1,4 +1,8 @@
-# Joom 🎥
+<p align="center">
+  <img src="icon-1024.png" width="128" alt="Joom" />
+</p>
+
+<h1 align="center">Joom 🎥</h1>
 
 Grabador de pantalla + webcam para **macOS**, mínimo y directo. Graba pantalla y
 cámara compuestas en tiempo real, con formas de cámara, borde de color, barra de
@@ -162,4 +166,15 @@ Genera un `.dmg` y un `.zip` (arm64 + x64) en `dist/` con `electron-builder --ma
 
 ## Licencia
 
-MIT — Jairo Carrizales
+**© 2026 Jairo Carrizales. Todos los derechos de autor quedan reservados.**
+
+Software de **código visible** pero **no de código abierto** (Open Source) bajo
+términos tradicionales.
+
+- **Se permite:** uso personal, educativo, modificación privada y estudio del código.
+- **Se prohíbe:** venta, distribución comercial, sublicenciamiento o monetización
+  (directa o indirecta) del software, sus ejecutables o cualquier obra derivada por
+  parte de terceros.
+- **Usos comerciales:** WhatsApp [+52 826 158 2103](https://wa.me/528261582103).
+
+Consulta el archivo [LICENSE](LICENSE) para los términos completos.

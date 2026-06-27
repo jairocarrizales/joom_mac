@@ -4,7 +4,7 @@
   "description": "Grabador de pantalla + webcam para macOS (pantalla completa, reel vertical, podcast) con barra de anotaciones para presentar",
   "main": "main.js",
   "author": "Jairo Carrizales <carribros@gmail.com>",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "start": "ELECTRON_RUN_AS_NODE= electron .",
     "dist": "electron-builder --mac",
