@@ -2,7 +2,7 @@
   <img src="icon-1024.png" width="128" alt="Joom" />
 </p>
 
-<h1 align="center">Joom 🎥</h1>
+<h1 align="center">Joom </h1>
 
 Grabador de pantalla + webcam para **macOS**, mínimo y directo. Graba pantalla y
 cámara compuestas en tiempo real, con formas de cámara, borde de color, barra de
